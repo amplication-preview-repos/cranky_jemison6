@@ -1,0 +1,59 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Word {
+  id         String     @id @default(cuid())
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  definition String?
+  word       String?
+  userWords  UserWord[]
+}
+
+model UserWord {
+  id        String              @id @default(cuid())
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  status    EnumUserWordStatus?
+  word      Word?               @relation(fields: [wordId], references: [id])
+  wordId    String?
+  user      User?               @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model Quiz {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  question      String?
+  correctAnswer String?
+  userAnswer    String?
+  isCorrect     Boolean?
+  user          User?    @relation(fields: [userId], references: [id])
+  userId        String?
+}
+
+model User {
+  id         String     @id @default(cuid())
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  firstName  String?
+  lastName   String?
+  username   String     @unique
+  email      String?    @unique
+  password   String
+  roles      Json
+  telegramId Int?
+  userWords  UserWord[]
+  quizzes    Quiz[]
+}
+
+enum EnumUserWordStatus {
+  Option1
+}
